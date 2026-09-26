@@ -38,6 +38,7 @@
         }
       ],
       "react-native-nfc-manager",
+      "./plugins/withAndroidReleaseSigning",
       [
         "expo-splash-screen",
         {

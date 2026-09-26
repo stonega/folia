@@ -18,6 +18,10 @@ bun run check
 bun test
 ```
 
+## Signed Android APK
+
+Run the [Signed Android APK](.github/workflows/signed-apk.yml) workflow from GitHub Actions, or push a `v*` tag. Download the signed APK from that run's artifacts. See [signing setup](docs/implementation/setup.md#signed-android-apk) for the required repository secrets and key backup guidance.
+
 ## What it does
 
 - Saves card photos and details locally.

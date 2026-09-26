@@ -10,3 +10,16 @@ The NFC dependency is pinned to `react-native-nfc-manager@4.0.0-beta.9` because 
 The web target is a visual preview (`bun run web`). Web cannot scan NFC. Photos are copied to app documents on native platforms and stored in AsyncStorage as references. Web preview photos are stored as data URLs in browser storage so they survive reloads; large collections may hit browser storage limits.
 
 The app is a starter product, not a credential emulator. Any future tap-to-use integration must be implemented per card issuer and platform capability. Native platform behavior must be tested on real hardware before release.
+
+## Signed Android APK
+
+The [Signed Android APK workflow](../../.github/workflows/signed-apk.yml) runs manually from GitHub Actions or when a `v*` tag is pushed. It regenerates `android/`, builds `:app:assembleRelease`, verifies that the APK certificate matches the release keystore, and uploads the APK as a workflow artifact for 30 days.
+
+Configure these repository Actions secrets before running it:
+
+- `FOLIO_ANDROID_KEYSTORE_BASE64`: the base64 encoding of the release keystore file, with no line breaks.
+- `FOLIO_ANDROID_STORE_PASSWORD`: the keystore password.
+- `FOLIO_ANDROID_KEY_ALIAS`: the signing key alias.
+- `FOLIO_ANDROID_KEY_PASSWORD`: the key password.
+
+Keep a separate, secure backup of the keystore and passwords. Future APK updates for the same Android package must use the same signing key. The keystore and passwords must never be committed. The generated Gradle project reads the file path and passwords from environment variables only during a release build; a missing keystore leaves a local release build unsigned instead of using the debug certificate.
