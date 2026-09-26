@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "Folio",
+    "slug": "folio-cards",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "folio",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.stone.folio",
+      "infoPlist": {
+        "NFCReaderUsageDescription": "Allow Folio to read compatible NFC card data."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#171A17",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.stone.folio"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Allow Folio to photograph your card.",
+          "photosPermission": "Allow Folio to choose a photo of your card.",
+          "microphonePermission": false
+        }
+      ],
+      "react-native-nfc-manager",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#171A17",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "resizeMode": "contain"
+        }
+      ]
+    ]
+  }
+}
