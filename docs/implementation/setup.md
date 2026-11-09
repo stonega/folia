@@ -13,14 +13,7 @@ The app is a starter product, not a credential emulator. Any future tap-to-use i
 
 ## Signed Android releases
 
-The [Signed Android releases workflow](../../.github/workflows/signed-apk.yml) runs manually from GitHub Actions or when a `v*` tag is pushed. It regenerates `android/`, builds `:app:assembleRelease` and `:app:bundleRelease`, verifies both signatures against the configured keystore, and uploads the APK and AAB as separate workflow artifacts for 30 days. The workflow produces files for review; it does not submit them to Google Play.
-
-Configure these repository Actions secrets before running it:
-
-- `FOLIO_ANDROID_KEYSTORE_BASE64`: the base64 encoding of the release keystore file, with no line breaks.
-- `FOLIO_ANDROID_STORE_PASSWORD`: the keystore password.
-- `FOLIO_ANDROID_KEY_ALIAS`: the signing key alias.
-- `FOLIO_ANDROID_KEY_PASSWORD`: the key password.
+Build signed Android releases locally using the signing setup below. The [App checks workflow](../../.github/workflows/checks.yml) runs `bun run check` and `bun test` manually from GitHub Actions or when a `v*` tag is pushed.
 
 Keep a separate, secure backup of the keystore and passwords. Direct APK updates for the same Android package must use the same signing key. With Play App Signing, Google signs the installed app, while this keystore is the upload key used to sign AAB submissions. Keep using the registered upload key for later submissions unless you reset it through Play Console. The keystore and passwords must never be committed. The generated Gradle project reads the file path and passwords from environment variables only during a release build; a missing keystore leaves a local release build unsigned instead of using the debug certificate.
 
