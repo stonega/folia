@@ -18,9 +18,9 @@ bun run check
 bun test
 ```
 
-## Signed Android APK
+## Signed Android releases
 
-Run the [Signed Android APK](.github/workflows/signed-apk.yml) workflow from GitHub Actions, or push a `v*` tag. Download the signed APK from that run's artifacts. See [signing setup](docs/implementation/setup.md#signed-android-apk) for the required repository secrets and key backup guidance.
+Run the [Signed Android releases](.github/workflows/signed-apk.yml) workflow from GitHub Actions, or push a `v*` tag. Download the signed APK for direct installation or the `folio-play-bundle` AAB for Google Play from that run's artifacts. See [signing setup](docs/implementation/setup.md#signed-android-releases) for the required repository secrets, local bundle builds, and key backup guidance.
 
 ## What it does
 

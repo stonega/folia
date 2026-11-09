@@ -1,4 +1,4 @@
-name: Signed Android APK
+name: Signed Android releases
 
 on:
   workflow_dispatch:
@@ -56,16 +56,16 @@ jobs:
             -storepass:env FOLIO_ANDROID_STORE_PASSWORD \
             -alias "$FOLIO_ANDROID_KEY_ALIAS" > /dev/null
 
-      - name: Build signed release APK
+      - name: Build signed release APK and Play bundle
         working-directory: android
         env:
           FOLIO_ANDROID_STORE_FILE: ${{ runner.temp }}/folia-release.jks
           FOLIO_ANDROID_STORE_PASSWORD: ${{ secrets.FOLIO_ANDROID_STORE_PASSWORD }}
           FOLIO_ANDROID_KEY_ALIAS: ${{ secrets.FOLIO_ANDROID_KEY_ALIAS }}
           FOLIO_ANDROID_KEY_PASSWORD: ${{ secrets.FOLIO_ANDROID_KEY_PASSWORD }}
-        run: ./gradlew :app:assembleRelease --no-daemon
+        run: ./gradlew :app:assembleRelease :app:bundleRelease --no-daemon
 
-      - name: Verify release signature
+      - name: Verify APK and Play bundle signatures
         env:
           FOLIO_ANDROID_STORE_PASSWORD: ${{ secrets.FOLIO_ANDROID_STORE_PASSWORD }}
           FOLIO_ANDROID_KEY_ALIAS: ${{ secrets.FOLIO_ANDROID_KEY_ALIAS }}
@@ -80,9 +80,22 @@ jobs:
             -storepass:env FOLIO_ANDROID_STORE_PASSWORD \
             -alias "$FOLIO_ANDROID_KEY_ALIAS" | sha256sum | cut -d ' ' -f 1)
           actual=$("$apksigner" verify --print-certs "$apk" | \
-            sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+            sed -n 's/^.*certificate SHA-256 digest: //p' | sort -u)
           if [ "$actual" != "$expected" ]; then
             echo 'APK certificate does not match the release keystore' >&2
+            exit 1
+          fi
+
+          aab=android/app/build/outputs/bundle/release/app-release.aab
+          test -s "$aab"
+          jarsigner -verify -keystore "$RUNNER_TEMP/folia-release.jks" \
+            -storepass:env FOLIO_ANDROID_STORE_PASSWORD "$aab"
+          bundle_certificate=$(keytool -printcert -rfc -jarfile "$aab" \
+            -keystore "$RUNNER_TEMP/folia-release.jks" \
+            -storepass:env FOLIO_ANDROID_STORE_PASSWORD | \
+            openssl x509 -outform DER | sha256sum | cut -d ' ' -f 1)
+          if [ "$bundle_certificate" != "$expected" ]; then
+            echo 'Play bundle certificate does not match the upload keystore' >&2
             exit 1
           fi
 
@@ -90,5 +103,12 @@ jobs:
         with:
           name: folia-signed-apk-${{ github.run_number }}
           path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: folio-play-bundle
+          path: android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 30
